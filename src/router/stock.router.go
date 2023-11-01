@@ -6,9 +6,10 @@ import (
 )
 
 func StockRouter(e *echo.Echo) {
-	e.GET("/stocks", controller.GetStocks)
-	e.POST("/stocks", controller.CreateStock)
-	e.GET("/stocks/:id", controller.GetStock)
-	e.PUT("/stocks/:id", controller.UpdateStock)
-	e.DELETE("/stocks/:id", controller.DeleteStock)
+	p := e.Group("/api/v1")
+	p.GET("/stocks", controller.GetStocks)
+	p.POST("/stocks", controller.CreateStock)
+	p.GET("/stocks/:id", controller.GetStock)
+	p.PUT("/stocks/:id", controller.UpdateStock)
+	p.DELETE("/stocks/:id", controller.DeleteStock)
 }
