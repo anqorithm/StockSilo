@@ -1,5 +1,3 @@
-// controller/stock.controller.go
-
 package controller
 
 import (
