@@ -54,7 +54,7 @@ func main() {
 	router.StockRouter(e)
 
 	// ##################### Start Server ##################### //
-	e.Logger.Fatal(e.Start(":9090"))
+	e.Logger.Fatal(e.Start(":4040"))
 }
 
 func (cv *CustomValidator) Validate(i interface{}) error {
