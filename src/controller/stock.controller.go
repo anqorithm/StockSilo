@@ -1,9 +1,11 @@
 package controller
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/qahta0/stocksilo/kafka"
 	"github.com/qahta0/stocksilo/model"
 	"github.com/qahta0/stocksilo/service"
 	"github.com/qahta0/stocksilo/utils"
@@ -38,7 +40,14 @@ func CreateStock(c echo.Context) error {
 	if err != nil {
 		return utils.RespondWithError(c, http.StatusInternalServerError, "Error creating stock", err)
 	}
-
+	stockBytes, err := json.Marshal(newStock)
+	if err != nil {
+		return utils.RespondWithError(c, http.StatusInternalServerError, "Error serializing stock data", err)
+	}
+	topic := "stocks"
+	if _, _, err := kafka.ProduceToKafka(topic, string(stockBytes)); err != nil {
+		return utils.RespondWithError(c, http.StatusInternalServerError, "Error sending stock data to Kafka", err)
+	}
 	return c.JSON(http.StatusCreated, newStock)
 }
 
