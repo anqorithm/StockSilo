@@ -48,6 +48,7 @@ func main() {
 			"message": "Welcome to StockSilo API 🚀",
 		})
 	})
+
 	e.GET("/health", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"message": "StockSilo API is healthy 🚀",

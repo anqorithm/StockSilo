@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/qahta0/stocksilo/model"
 	"github.com/qahta0/stocksilo/service"
+	"github.com/qahta0/stocksilo/utils"
 )
 
 func GetStocks(c echo.Context) error {
@@ -24,21 +25,37 @@ func GetStocks(c echo.Context) error {
 }
 
 func CreateStock(c echo.Context) error {
-	var stock model.Stock
-	if err := c.Bind(&stock); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Internal server error"})
+	var createStockRequest model.CreateStockRequest
+
+	if err := c.Bind(&createStockRequest); err != nil {
+		return utils.RespondWithError(c, http.StatusInternalServerError, "Internal Server Error", err)
 	}
-	if err := c.Validate(&stock); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{
-			"error":   "Validation failed for stock data",
-			"details": err.Error(),
-		})
+	if err := c.Validate(&createStockRequest); err != nil {
+		return utils.RespondWithError(c, http.StatusBadRequest, "Validation failed for stock data", err)
 	}
-	newStock, err := service.CreateStockService(&stock)
+
+	newStock, err := service.CreateStockService(&createStockRequest)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Internal server error"})
+		return utils.RespondWithError(c, http.StatusInternalServerError, "Error creating stock", err)
 	}
+
 	return c.JSON(http.StatusCreated, newStock)
+}
+
+func UpdateStock(c echo.Context) error {
+	var updateStockRequest model.UpdateStockRequest
+	if err := c.Bind(&updateStockRequest); err != nil {
+		return utils.RespondWithError(c, http.StatusInternalServerError, "Internal Server Error", err)
+	}
+	if err := c.Validate(&updateStockRequest); err != nil {
+		return utils.RespondWithError(c, http.StatusBadRequest, "Validation failed for stock data", err)
+	}
+	stockID := c.Param("id")
+	updatedStock, err := service.UpdateStockService(stockID, &updateStockRequest)
+	if err != nil {
+		return utils.RespondWithError(c, http.StatusInternalServerError, "Error updating stock", err)
+	}
+	return c.JSON(http.StatusOK, updatedStock)
 }
 
 func GetStock(c echo.Context) error {
@@ -50,31 +67,6 @@ func GetStock(c echo.Context) error {
 	}
 	if stock == nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"message": "Stock not found"})
-	}
-	return c.JSON(http.StatusOK, stock)
-}
-
-func UpdateStock(c echo.Context) error {
-	id := c.Param("id")
-	var stock model.Stock
-	if err := c.Bind(&stock); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Internal server error"})
-	}
-	stock.ID = id
-	existingStock, err := service.GetStockService(id)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Internal server error"})
-	}
-	if existingStock == nil {
-		return c.JSON(http.StatusNotFound, map[string]string{
-			"error": "Stock not found",
-		})
-	}
-	if err := service.UpdateStockService(&stock); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error":   "Failed to update stock",
-			"details": err.Error(),
-		})
 	}
 	return c.JSON(http.StatusOK, stock)
 }

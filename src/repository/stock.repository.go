@@ -1,5 +1,3 @@
-// repository/stock.repository.go
-
 package repository
 
 import (
@@ -33,9 +31,10 @@ func GetStocks() ([]model.Stock, error) {
 	return stocks, err
 }
 
-func UpdateStock(stock *model.Stock) error {
+func UpdateStock(stock *model.Stock) (*model.Stock, error) {
 	db := config.DB()
-	return db.Save(&stock).Error
+	err := db.Save(&stock).Error
+	return stock, err
 }
 
 func DeleteStock(id string) error {
