@@ -16,6 +16,12 @@
 
 ## Technology Used
 
+1. Echo
+2. CockroachDB
+3. Spark
+4. Kafka
+5. Zookeeper
+
 ## Prerequisites
 
 ## Notes
