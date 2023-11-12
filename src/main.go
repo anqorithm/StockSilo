@@ -13,27 +13,22 @@ import (
 )
 
 func main() {
+	// ##################### Init Application ##################### //
 	e := echo.New()
 	e.Validator = &CustomValidator{validator: validator.New()}
 
 	// ##################### Middlewares ##################### //
-
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
 	// ##################### Start Configurations ##################### //
-
 	config.LoadEnvs()
 	config.DatabaseInit()
 
-	// ##################### End Configurations ##################### //
-
 	// ##################### Migratations ##################### //
-
 	repository.Migrate()
 
 	// ##################### Test Database ##################### //
-
 	gorm := config.DB()
 	dbGorm, err := gorm.DB()
 	if err != nil {
@@ -42,7 +37,6 @@ func main() {
 	dbGorm.Ping()
 
 	// ##################### Routes ##################### //
-
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]interface{}{
 			"message": "Welcome to StockSilo API 🚀",
@@ -60,7 +54,6 @@ func main() {
 	router.StockRouter(e)
 
 	// ##################### Start Server ##################### //
-
 	e.Logger.Fatal(e.Start(":9090"))
 }
 
